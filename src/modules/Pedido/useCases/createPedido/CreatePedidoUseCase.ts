@@ -1,3 +1,4 @@
+import { AppDataSource } from "../../../../data-source"
 import { AppError } from "../../../../error/AppError"
 import { MesaRepository } from "../../../Mesa/repositories/implementations/Mesa.repository"
 import { Pedido } from "../../entity/Pedido"
@@ -18,9 +19,15 @@ export class CreatePedidoUseCase {
       throw new AppError("Mesa não finalizada, escolha outra mesa", 404)
     }
 
+    const queryRunner = AppDataSource.createQueryRunner()
+
+    await queryRunner.connect()
+
+    await queryRunner.startTransaction()
+
     mesa.mesa_status = false
     mesa.mesa_abertura = new Date()
-
+    
     const pedido_quantidade = ""
 
     const pedido = PedidoRepository.create({
@@ -28,7 +35,10 @@ export class CreatePedidoUseCase {
       pedido_quantidade
     })
 
-    await PedidoRepository.save(pedido)
+    await queryRunner.manager.save(mesa)
+    await queryRunner.manager.save(pedido)
+
+    await queryRunner.commitTransaction()
 
     return pedido
     

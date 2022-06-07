@@ -30,8 +30,6 @@ export class FinalizaPedidoUseCase {
       total = total + (parseInt(arrayQtd[i]) * pedido.produtos[i].produto_valor)
     }
 
-    pedido.mesa.mesa_id
-
     const mesa = await MesaRepository.findOne({
       where: {
         mesa_id: pedido.mesa.mesa_id
